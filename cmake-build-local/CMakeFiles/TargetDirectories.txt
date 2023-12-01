@@ -1,0 +1,3 @@
+/Users/antoniajanuszewicz/Downloads/lattices-master/cmake-build-local/CMakeFiles/lattices_master.dir
+/Users/antoniajanuszewicz/Downloads/lattices-master/cmake-build-local/CMakeFiles/edit_cache.dir
+/Users/antoniajanuszewicz/Downloads/lattices-master/cmake-build-local/CMakeFiles/rebuild_cache.dir
