@@ -342,10 +342,10 @@ size_t poly_main(const unsigned int plain_bits, const unsigned int num_users, co
 
     Aggregator_RNS agg(plain_bits, scale, num_users, sc, packed_size, beta);
     auto agg_parms = agg.parms_ptrs();
-    Polynomial agg_key(agg_parms.second);
+    Polynomial agg_key(agg_parms.first);
     size_t ret = agg_key.poly_mod_degree();
     cout << "#Agg.: N " << agg_key.poly_mod_degree() << " k " << agg_key.mod_count() << endl;
-    Polynomial pl(agg_parms.first);
+    Polynomial pl(agg_parms.second);
     cout << "#Plain space: k' " << pl.mod_count() << endl;
 #ifdef DEBUG
     assert(agg_key.buffer() != NULL);
@@ -370,7 +370,7 @@ size_t poly_main(const unsigned int plain_bits, const unsigned int num_users, co
     for(unsigned int i = 0; i < iters; i++){
         double dec_time;
         res = agg.poly_dec(agg_key, ctexts, ts, dec_time, num_users);
-        if (i == 0) for (int i = 0; i < mult_res.size(); i++) mult_res.at(i) *= res.at(i);
+        if (i == 0) for (int j = 0; j < mult_res.size(); j++) mult_res.at(j) *= res.at(j);
         else mult_res = res;
         //os << res << '\n';
         dec_times.push_back(dec_time);

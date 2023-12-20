@@ -421,7 +421,7 @@ public:
 #if CHRONO_TIME      
       start = high_resolution_clock::now();
 #endif
-        noisy_input.ppow(noisy_input,noisy_input,e);
+      noisy_input.ppow(noisy_input,noisy_input,e);
       noisy_input.add_dpg_noise(this->dl, num, den);
 #if CHRONO_TIME      
       end = high_resolution_clock::now();
@@ -438,6 +438,7 @@ public:
 #if CHRONO_TIME
     start = high_resolution_clock::now();
 #endif
+    cout << " Encryption mod count " << noisy_input.mod_count() << endl;
     vector<COMPL_FLOAT> float_result = Polynomial_to_float_encoding(noisy_input);
 
     for (int i = 0; i < float_result.size(); i++){
@@ -450,6 +451,7 @@ public:
     Polynomial poly_result = encoding_to_Polynomial(ckks_result,x.parameters());
 
     Polynomial enc_result = (sc==NS)? noise_scaled_enc(sk, poly_result, pk) : message_scaled_enc(sk, poly_result, pk);
+    cout << " Encrypted mod count " << enc_result.mod_count() << endl;
 
 #if CHRONO_TIME    
     end = high_resolution_clock::now();
@@ -596,6 +598,7 @@ public:
 #endif
         Polynomial ret = (this->sc == NS) ? noise_scaled_dec(agg_key, pk, vals, num_additions) : message_scaled_dec(agg_key, pk, vals, num_additions);
         //ret.ppow(ret,ret,M_E);
+        cout << ret.mod_count() << " is the final plaintext count " << endl;
         CKKSEncoder ckksEncoder = CKKSEncoder(2048,2);
         vector<INT_T> int_result = Polynomial_to_encoding(ret);
         vector<COMPL_FLOAT> float_result = ckksEncoder.decode(int_result);
@@ -716,7 +719,7 @@ void test_poly_enc(vector<Polynomial> & ctexts, Aggregator_RNS & agg, const Poly
     noise_times.clear();
     enc_times.clear();
     auto params_pair = agg.parms_ptrs();
-    Polynomial input(params_pair.second);
+    Polynomial input(params_pair.first);
     vector<Polynomial> sec_keys;
     unsigned int users = agg.user_count();
     DiscreteLaplacian * agg_dl = agg.dist();
@@ -729,7 +732,7 @@ void test_poly_enc(vector<Polynomial> & ctexts, Aggregator_RNS & agg, const Poly
     ctexts.reserve(users);
     agg.secret_keys(agg_key, sec_keys);
     //Polynomial result(params_pair.first);
-    Polynomial result(params_pair.first);
+    Polynomial result(params_pair.second);
     for(unsigned int i = 0; i < users; i++){
         //First, get some random vector for user input
         input.uniform(*agg_dl);
