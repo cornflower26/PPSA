@@ -200,6 +200,7 @@ public:
 			sign = sample_bernoulli(1, 2);
 			//Switch order cause of the inverse
 			magnitude = sample_geometric_exp_fast(scale_den, scale_num);
+			magnitude = sample_geometric_exp_fast(scale_den, scale_num);
 		} while(sign && !magnitude);
 		return magnitude*(1-(sign << 1));
 	}
