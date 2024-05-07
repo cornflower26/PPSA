@@ -2,10 +2,10 @@
 #define CKKS_AGGREGATOR_H
 
 #include <vector>
+#include "Polynomial.h"
 
 
 #include "CKKS_Encoder.h"
-#include "Polynomial.h"
 
 using std::vector;
 

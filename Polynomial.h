@@ -1633,7 +1633,7 @@ inline uint64_t set(const size_t coeff_idx, const size_t mod_idx, const int valu
     }
   }
 
-  void add_dp_noise(DiscreteLaplacian & dl, const int num, const int den){
+  void  add_dp_noise(DiscreteLaplacian & dl, const int num, const int den){
     size_t n = this->poly_mod_degree();
     size_t k = this->parms->moduli_count();
     for(size_t i = 0; i < n; i++){

@@ -22,6 +22,7 @@
 #endif
 
 #include "CKKS_Aggregator.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -408,7 +409,7 @@ public:
     return enc_result;
   }
 
-  Polynomial poly_enc(const Polynomial & x, const Polynomial & sk, const Polynomial & pk,
+  Polynomial poly_enc(const vector<COMPL_FLOAT> & x, const Polynomial & sk, const Polynomial & pk,
     bool do_noise, 
     double & noise_time, double & enc_time, const uint64_t e){
 #if CHRONO_TIME
@@ -416,13 +417,13 @@ public:
 #endif    
     //First, add differentially private noise to x
     //No easy way around copying x while keeping input clean
-    Polynomial noisy_input = x; 
+      vector<COMPL_FLOAT> noisy_input = x;
     if(do_noise){
 #if CHRONO_TIME      
       start = high_resolution_clock::now();
 #endif
-      noisy_input.ppow(noisy_input,noisy_input,e);
-      noisy_input.add_dpg_noise(this->dl, num, den);
+      ppow(noisy_input,e);
+      add_dpg_noise(noisy_input, this->dl, num, den);
 #if CHRONO_TIME      
       end = high_resolution_clock::now();
       noise_time = duration_cast<chrono::nanoseconds>(end-start).count();
@@ -438,17 +439,17 @@ public:
 #if CHRONO_TIME
     start = high_resolution_clock::now();
 #endif
-    cout << " Encryption mod count " << noisy_input.mod_count() << endl;
-    vector<COMPL_FLOAT> float_result = Polynomial_to_float_encoding(noisy_input);
+    //cout << " Encryption mod count " << noisy_input.mod_count() << endl;
+    //vector<COMPL_FLOAT> float_result = Polynomial_to_float_encoding(noisy_input);
 
-    for (int i = 0; i < float_result.size(); i++){
-        float_result.at(i) = log(float_result.at(i));
+    for (int i = 0; i < noisy_input.size(); i++){
+        noisy_input.at(i) = log(noisy_input.at(i));
     }
-    cout << float_result.size() << " is the size " << endl;
+    cout << noisy_input.size() << " is the size " << endl;
     CKKSEncoder ckksEncoder = CKKSEncoder(2048,1);
-    vector<INT_T> ckks_result = ckksEncoder.encode(float_result);
+    vector<INT_T> ckks_result = ckksEncoder.encode(noisy_input);
 
-    Polynomial poly_result = encoding_to_Polynomial(ckks_result,x.parameters());
+    Polynomial poly_result = encoding_to_Polynomial(ckks_result, this->plain_parms);
 
     Polynomial enc_result = (sc==NS)? noise_scaled_enc(sk, poly_result, pk) : message_scaled_enc(sk, poly_result, pk);
     cout << " Encrypted mod count " << enc_result.mod_count() << endl;
@@ -719,7 +720,8 @@ void test_poly_enc(vector<Polynomial> & ctexts, Aggregator_RNS & agg, const Poly
     noise_times.clear();
     enc_times.clear();
     auto params_pair = agg.parms_ptrs();
-    Polynomial input(params_pair.first);
+    //Polynomial input(params_pair.first);
+    vector<COMPL_FLOAT> input;
     vector<Polynomial> sec_keys;
     unsigned int users = agg.user_count();
     DiscreteLaplacian * agg_dl = agg.dist();
@@ -735,7 +737,7 @@ void test_poly_enc(vector<Polynomial> & ctexts, Aggregator_RNS & agg, const Poly
     Polynomial result(params_pair.second);
     for(unsigned int i = 0; i < users; i++){
         //First, get some random vector for user input
-        input.uniform(*agg_dl);
+        uniform(input, *agg_dl);
         //Then, do the encryption
         double noise_time, enc_time;
         result = agg.poly_enc(input, sec_keys[i], pk,
