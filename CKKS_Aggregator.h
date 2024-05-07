@@ -51,7 +51,7 @@ ZZX encoding_to_ntl(const vector<INT_T> & vals, const ZZ & modulus){
 vector<INT_T> Polynomial_to_encoding(const Polynomial & p){
   if(p.mod_count() != 1){
       cout << p.mod_count() << " mod count" << endl;
-    assert("ERROR: this function not supported for multi-modulus RNS" && 0);
+    //assert("ERROR: this function not supported for multi-modulus RNS" && 0);
   }
   vector<INT_T> ret;
   ret.resize(p.poly_mod_degree());
